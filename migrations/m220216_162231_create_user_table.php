@@ -46,7 +46,7 @@ class m220216_162231_create_user_table extends Migration
             'patronymic' => 'Иванович',
             'username' => 'admin',
             'email' => 'admin@admin.ru',
-            'password' => md5('admin'),
+            'password' => md5('admin11'),
             'role_id' => 1,
         ]);
     }
