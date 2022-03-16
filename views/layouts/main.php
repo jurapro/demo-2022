@@ -41,7 +41,11 @@ AppAsset::register($this);
             ['label' => 'Home', 'url' => ['/site/index']],
             ['label' => 'About', 'url' => ['/site/about']],
             ['label' => 'Contact', 'url' => ['/site/contact']],
+            ['label' => 'Админ-панель', 'url' => ['/admin'],
+                'visible' => !Yii::$app->user->isGuest and Yii::$app->user->identity->isAdmin()
+            ],
             ['label' => 'Зарегистирироваться', 'url' => ['/user/create'], 'visible' => Yii::$app->user->isGuest],
+            ['label' => 'Мои заказы', 'url' => ['/order'], 'visible' => !Yii::$app->user->isGuest],
             Yii::$app->user->isGuest ? (
             ['label' => 'Login', 'url' => ['/site/login']]
             ) : (
