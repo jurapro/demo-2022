@@ -5,22 +5,22 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "role".
+ * This is the model class for table "status".
  *
  * @property int $id
  * @property string $code
  * @property string $name
  *
- * @property User[] $users
+ * @property Order[] $orders
  */
-class Role extends \yii\db\ActiveRecord
+class Status extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'role';
+        return 'status';
     }
 
     /**
@@ -48,12 +48,12 @@ class Role extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Users]].
+     * Gets query for [[Orders]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getUsers()
+    public function getOrders()
     {
-        return $this->hasMany(User::className(), ['role_id' => 'id']);
+        return $this->hasMany(Order::className(), ['status_id' => 'id']);
     }
 }

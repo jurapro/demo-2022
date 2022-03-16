@@ -5,22 +5,21 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "role".
+ * This is the model class for table "category".
  *
  * @property int $id
- * @property string $code
  * @property string $name
  *
- * @property User[] $users
+ * @property Product[] $products
  */
-class Role extends \yii\db\ActiveRecord
+class Category extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'role';
+        return 'category';
     }
 
     /**
@@ -29,9 +28,8 @@ class Role extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['code', 'name'], 'required'],
-            [['code', 'name'], 'string', 'max' => 255],
-            [['code'], 'unique'],
+            [['name'], 'required'],
+            [['name'], 'string', 'max' => 255],
         ];
     }
 
@@ -42,18 +40,17 @@ class Role extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'code' => 'Code',
             'name' => 'Name',
         ];
     }
 
     /**
-     * Gets query for [[Users]].
+     * Gets query for [[Products]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getUsers()
+    public function getProducts()
     {
-        return $this->hasMany(User::className(), ['role_id' => 'id']);
+        return $this->hasMany(Product::className(), ['category_id' => 'id']);
     }
 }

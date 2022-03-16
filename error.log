@@ -1,0 +1,1 @@
+[Wed Mar 16 04:47:15.590427 2022] [php:error] [pid 5980] [client 192.168.13.41:39435] PHP Fatal error:  Cannot use empty array elements in arrays in /srv/users/gszdfems/pktyvmi-m1/views/order/index.php on line 28
