@@ -39,6 +39,9 @@ class Order extends \yii\db\ActiveRecord
             [['rejection_reason'], 'string'],
             [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => Status::className(), 'targetAttribute' => ['status_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
+            [['rejection_reason'], 'required', 'when' => function ($model) {
+                return $model->status->code == 'rejected';
+            }],
         ];
     }
 
@@ -53,6 +56,7 @@ class Order extends \yii\db\ActiveRecord
             'user_id' => 'User ID',
             'status_id' => 'Status ID',
             'rejection_reason' => 'Rejection Reason',
+            'statusName' => 'Статус заказа',
         ];
     }
 
@@ -74,6 +78,11 @@ class Order extends \yii\db\ActiveRecord
     public function getStatus()
     {
         return $this->hasOne(Status::className(), ['id' => 'status_id']);
+    }
+
+    public function getStatusName()
+    {
+        return $this->status->name;
     }
 
     /**
