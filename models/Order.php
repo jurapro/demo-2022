@@ -37,6 +37,11 @@ class Order extends \yii\db\ActiveRecord
             [['user_id'], 'required'],
             [['user_id', 'status_id'], 'integer'],
             [['rejection_reason'], 'string'],
+            ['rejection_reason', 'required', 'when' => function ($model) {
+                return $model->status->code == 'rejected';
+            }, 'whenClient' => "function (attribute, value) {
+        return false;
+    }"],
             [['status_id'], 'exist', 'skipOnError' => true, 'targetClass' => Status::className(), 'targetAttribute' => ['status_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
         ];
