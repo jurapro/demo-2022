@@ -23,6 +23,8 @@ use Yii;
  */
 class Product extends \yii\db\ActiveRecord
 {
+    public $imageFile;
+
     /**
      * {@inheritdoc}
      */
@@ -42,7 +44,20 @@ class Product extends \yii\db\ActiveRecord
             [['count', 'year', 'category_id'], 'integer'],
             [['name', 'file', 'model', 'country'], 'string', 'max' => 255],
             [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Category::className(), 'targetAttribute' => ['category_id' => 'id']],
+            [['imageFile'], 'file', 'skipOnEmpty' => false, 'extensions' => 'png, jpg'],
         ];
+    }
+
+    public function upload()
+    {
+        if ($this->validate()) {
+            $fileName = 'uploads/' . $this->imageFile->baseName . '.' . $this->imageFile->extension;
+            $this->imageFile->saveAs($fileName);
+            $this->file = '/' . $fileName;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

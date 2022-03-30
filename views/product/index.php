@@ -26,12 +26,14 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'date',
             'name',
-            'file',
+            [
+                'label' => 'Изображение',
+                'format'=>'html',
+                'value' => function ($data) {
+                    return Html::img($data->file, ['width' => 200]);
+                }
+            ],
             'count',
-            //'year',
-            //'model',
-            //'country',
-            //'category_id',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

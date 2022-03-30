@@ -2,7 +2,11 @@
 
 namespace app\controllers;
 
+use app\models\Cart;
+use app\models\Order;
+use app\models\Product;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\Response;
@@ -23,7 +27,7 @@ class SiteController extends Controller
                 'only' => ['logout'],
                 'rules' => [
                     [
-                        'actions' => ['logout'],
+                        'actions' => ['logout', 'cart'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -61,7 +65,29 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        $dataProvider = new ActiveDataProvider([
+            'query' => Product::find()->where(['>', 'count', 0]),
+            'sort' => [
+                'defaultOrder' => [
+                    'date' => SORT_DESC,
+                ]
+            ],
+        ]);
+
+        return $this->render('index', [
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    public function actionCart()
+    {
+        $dataProvider = new ActiveDataProvider([
+            'query' => Cart::find()->where(['user_id' => \Yii::$app->user->id]),
+        ]);
+
+        return $this->render('cart', [
+            'dataProvider' => $dataProvider,
+        ]);
     }
 
     /**

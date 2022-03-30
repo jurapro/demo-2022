@@ -4,9 +4,11 @@ namespace app\controllers;
 
 use app\models\Product;
 use yii\data\ActiveDataProvider;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 /**
  * ProductController implements the CRUD actions for Product model.
@@ -25,6 +27,20 @@ class ProductController extends Controller
                     'class' => VerbFilter::className(),
                     'actions' => [
                         'delete' => ['POST'],
+                    ],
+                ],
+                'access' => [
+                    'class' => AccessControl::className(),
+                    'only' => ['*'],
+                    'rules' => [
+                        [
+                            'actions' => ['index', 'create', 'update', 'delete'],
+                            'allow' => true,
+                            'roles' => ['@'],
+                            'matchCallback' => function ($rule, $action) {
+                                return \Yii::$app->user->identity->isAdmin();
+                            }
+                        ]
                     ],
                 ],
             ]
@@ -79,8 +95,11 @@ class ProductController extends Controller
         $model = new Product();
 
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+            if ($model->load($this->request->post())) {
+                $model->imageFile = UploadedFile::getInstance($model, 'imageFile');
+                if ($model->upload() && $model->save(false)) {
+                    return $this->redirect(['index']);
+                }
             }
         } else {
             $model->loadDefaultValues();
