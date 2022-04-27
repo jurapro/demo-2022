@@ -123,4 +123,9 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     {
         return $this->hasOne(Role::className(), ['id' => 'role_id']);
     }
+
+    public function getCarts()
+    {
+        return $this->hasMany(Cart::className(), ['user_id' => 'id']);
+    }
 }

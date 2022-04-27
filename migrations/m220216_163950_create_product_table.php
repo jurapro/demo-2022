@@ -18,6 +18,7 @@ class m220216_163950_create_product_table extends Migration
             'name' => $this->string()->notNull(),
             'file' => $this->string()->null(),
             'count' => $this->integer()->defaultValue(0),
+            'price' => $this->decimal()->defaultValue(0),
             'year' => $this->integer()->defaultValue(2022),
             'model' => $this->string()->null(),
             'country' => $this->string()->null(),

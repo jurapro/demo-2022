@@ -5,6 +5,9 @@ namespace app\controllers;
 use app\models\Cart;
 use app\models\Order;
 use app\models\Product;
+use app\models\ProductOrder;
+use app\models\Status;
+use app\models\User;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
@@ -27,7 +30,7 @@ class SiteController extends Controller
                 'only' => ['logout'],
                 'rules' => [
                     [
-                        'actions' => ['logout', 'cart'],
+                        'actions' => ['logout', 'cart', 'to-cart', 'remove-cart', 'by-order'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -88,6 +91,89 @@ class SiteController extends Controller
         return $this->render('cart', [
             'dataProvider' => $dataProvider,
         ]);
+    }
+
+    public function actionToCart($id_product)
+    {
+        $product = Product::find()
+            ->where(['id' => $id_product])
+            ->andWhere(['>', 'count', 0])
+            ->one();
+
+        if (!$product) {
+            return "Такого продукта нет";
+        }
+
+        $itemInCart = Cart::find()
+            ->where(['product_id' => $id_product])
+            ->andWhere(['user_id' => Yii::$app->user->getId()])
+            ->one();
+
+        if (!$itemInCart) {
+            $itemInCart = new Cart([
+                'product_id' => $id_product,
+                'user_id' => Yii::$app->user->getId(),
+                'count' => 1
+            ]);
+            $itemInCart->save();
+            return "Продукт добавлен. Количество товаров в корзине = $itemInCart->count";
+        }
+
+        if ($itemInCart->count + 1 > $product->count) {
+            return "Нельзя больше добавить";
+        }
+
+        $itemInCart->count++;
+        $itemInCart->save();
+        return "Продукт добавлен. Количество товаров в корзине = $itemInCart->count";
+    }
+
+    public function actionRemoveCart($id_product)
+    {
+        $itemInCart = Cart::find()
+            ->where(['product_id' => $id_product])
+            ->andWhere(['user_id' => Yii::$app->user->getId()])
+            ->one();
+
+        if (!$itemInCart) {
+            return;
+        }
+
+        if ($itemInCart->count - 1 == 0) {
+            $itemInCart->delete();
+            return;
+        }
+
+        $itemInCart->count--;
+        $itemInCart->save();
+        return;
+    }
+
+    public function actionByOrder($password)
+    {
+        if (!Yii::$app->user->identity->validatePassword($password)) {
+            return "Пароль не верный";
+        }
+
+        $order = new Order([
+            'user_id' => Yii::$app->user->getId(),
+            'status_id' => Status::find()->where(['code' => 'new'])->one()->id
+        ]);
+        $order->save();
+
+        $itemInCart = Yii::$app->user->identity->carts;
+
+        foreach ($itemInCart as $item) {
+            $itemInOrder = new ProductOrder([
+                'order_id' => $order->id,
+                'product_id' => $item->product_id,
+                'count' => $item->count,
+                'price' => $item->product->price * $item->count,
+            ]);
+            $itemInOrder->save();
+            $item->delete();
+        }
+        return "Заказ сформирован";
     }
 
     /**
