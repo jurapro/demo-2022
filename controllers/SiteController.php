@@ -27,7 +27,7 @@ class SiteController extends Controller
                 'only' => ['logout'],
                 'rules' => [
                     [
-                        'actions' => ['logout', 'cart'],
+                        'actions' => ['logout', 'cart', 'to-cart'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -88,6 +88,40 @@ class SiteController extends Controller
         return $this->render('cart', [
             'dataProvider' => $dataProvider,
         ]);
+    }
+
+    public function actionToCart($id_product)
+    {
+        $product = Product::find()
+            ->where(['id' => $id_product])
+            ->andwhere(['>', 'count', 0])
+            ->one();
+
+        if (!$product) {
+            return 'Такого продукта нет';
+        }
+
+        $itemInCart = Cart::find()
+            ->where(['product_id' => $id_product])
+            ->andwhere(['user_id' => Yii::$app->user->id])
+            ->one();
+
+        if (!$itemInCart) {
+            $itemInCart = new Cart([
+                'product_id' => $id_product,
+                'user_id' => Yii::$app->user->id,
+                'count' => 1
+            ]);
+            $itemInCart->save();
+            return 'Продукт добавлен. Количество товаров в корзине = ' . $itemInCart->count;
+        }
+
+        if ($itemInCart->count + 1 > $product->count) {
+            return 'Нельзя добавить больше';
+        }
+        $itemInCart->count++;
+        $itemInCart->save();
+        return 'Продукт добавлен. Количество товаров в корзине = ' . $itemInCart->count;
     }
 
     /**
